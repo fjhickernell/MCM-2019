@@ -16,7 +16,7 @@ basisNames = ["Walsh","Legendre","Chebyshev","CosineSine"];
 nBasis = length(basisNames);
 aa = [0 -1 -1 0];
 bb = [1 1 1 1];
-for nB = 1:1
+for nB = 1:nBasis
    % One dimensional basis plots
    a = aa(nB);
    b = bb(nB);
@@ -33,7 +33,7 @@ for nB = 1:1
       plot(x1plot,y,'-')
       axis([a b -1.2 1.2])
       set(gca,'Visible','off')
-      text(horizOff,vertOff,['\boldmath\(j\,\) \unboldmath \(= (' int2str(s) ', 0, \ldots, 0)\)'], ...
+      text(horizOff,vertOff,['\boldmath\(k\,\) \unboldmath \(= (' int2str(s) ', 0, \ldots, 0)\)'], ...
          'interpreter','latex','fontsize',48)
        eval(['print(''' char(basisNames(nB)) '_Degree_' int2str(s) '.png'',' ...
           '''-dpng'')'])
@@ -51,7 +51,7 @@ for nB = 1:1
       surf(xx,yy,z); shading interp
       axis([a b a b -1.2 1.2])
       set(gca,'Visible','off')
-      text(xOff,yOff,zOff,['\boldmath\(j\,\) \unboldmath \(= (' int2str(twoD(j,1)), ...
+      text(xOff,yOff,zOff,['\boldmath\(k\,\) \unboldmath \(= (' int2str(twoD(j,1)), ...
          ',' int2str(twoD(j,2)) ', 0, \ldots, 0)\)'], ...
          'interpreter','latex','fontsize',48)
        eval(['print -dpng ' char(basisNames(nB)) '_Degree_' int2str(twoD(j,1)) ...
