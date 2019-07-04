@@ -28,6 +28,12 @@
 \DeclareMathOperator{\sol}{SOL}
 \DeclareMathOperator{\app}{APP}
 \DeclareMathOperator{\alg}{ALG}
+\DeclareMathOperator{\ERR}{ERR}
+\newcommand{\dataN}{\bigl(\hf(\vk_i)\bigr)_{i=1}^n}
+\newcommand{\dataNj}{\bigl(\hf(\vk_i)\bigr)_{i=1}^{n_j}}
+\newcommand{\dataNjd}{\bigl(\hf(\vk_i)\bigr)_{i=1}^{n_{j^\dagger}}}
+\newcommand{\ERRN}{\ERR\bigl(\dataN,n\bigr)}
+
 \newcommand{\Sapp}{S_{\textup{app}}}
 \newcommand{\LambdaStd}{\Lambda^{\textup{std}}}
 \newcommand{\LambdaSer}{\Lambda^{\textup{ser}}}
@@ -54,8 +60,8 @@ Adaptive algorithms are convenient for the practitioner because they automatical
 	\href{mailto:hickernell@iit.edu}{\url{hickernell@iit.edu}} \quad
 	\href{http://mypages.iit.edu/~hickernell}{\url{mypages.iit.edu/~hickernell}}}
 
-\thanksnote{{\large Joint work with Yuhan Ding, Peter Kritzer, and Simon Mak} \\
-	This work partially supported by  NSF-DMS-1522687 and NSF-DMS-1638521 (SAMSI)
+\thanksnote{with Yuhan Ding, Peter Kritzer, and Simon Mak \\
+	partially supported by  NSF-DMS-1522687 and NSF-DMS-1638521 (SAMSI)
 }
 \event{Twelfth International Conference on Monte Carlo Methods and Applications}
 \date[]{July 8, 2019}
@@ -98,25 +104,25 @@ Adaptive algorithms are convenient for the practitioner because they automatical
 \vspace{-5ex}
 
 \begin{itemize}
-	\item $\sol : \cf \to \cg$ is linear \alert{solution} operator, $\cf$ is space of functions defined on $\Omega \subseteq \reals^d$ \\
-	\qquad e.g., $\sol(f) = f$, \quad $- \nabla^2 \sol(f) = f,   \sol(f) = 0$  on boundary
-	\item $\app(f,n) = \sum_{i=1}^n L_i(f) g_i$ is \alert{approximation} \\
+	\item Linear \alert{solution} operator $\sol : \cf \to \cg$, input space $\cf$ contains functions defined on $\Omega \subseteq \reals^d$ \\
+	\qquad e.g., $\sol(f) = f$, \quad $- \nabla^2 \sol(f) = f, \  \sol(f) = 0$  on boundary
+	\item \alert{Approximation} $\app(f,n) = \sum_{i=1}^n L_i(f) g_i$ \\
 	\qquad $\norm[\cg]{\sol(f) - \app(f,n)} \le \norm[\cf \to \cg]{\sol - \app(\cdot,n)} \norm[\cf]{f}$
-	\item $\alg(f,\varepsilon) = \app(f,n^*(f,\varepsilon))$ is \alert{algorithm} satisfying  
-	$\norm[\cg]{\sol(f) - \alg(f,\varepsilon)} \le \varepsilon$
+	\item \alert{Algorithm} $\alg(f,\varepsilon) = \app(f,n^*(f,\varepsilon))$ satisfying  
+	$\norm[\cg]{\sol(f) - \alg(f,\varepsilon)} \le \varepsilon$ for all $f \in \cc$
 
-\uncover<2->{\item \alert{Solvability:} what assumptions on $f$ to determine $n^*(f,\varepsilon) \in \naturals$ \alert{correctly}?  
-	\only<4->{\smallscoop\only<5->{\hspace{-6ex}\raisebox{-1.5ex}{\color{red}\fontsize{40}{48}\selectfont $\times$}} or \smallcone}
-\only<3>{
+\uncover<2->{\item \alert{Solvability:} what $\cc$?  how  to determine $n^*(f,\varepsilon) \in \naturals$?  
+	\only<3->{\smallscoop\only<3->{\hspace{-6.5ex}\raisebox{-1.5ex}{\color{red}\fontsize{40}{48}\selectfont $\times$}} or \smallcone}
+\only<2>{
 	
 	\begin{itemize}
 	\item $n^*(f,\varepsilon) = \min\{n : \norm[\cf \to \cg]{\sol - \app(\cdot,n)} \le \varepsilon / R\}$  if $f \in \smallscoop$ of radius $R$
 	
-	\item Alternative is to assume $f \in \smallcone$ and to bound $ \norm[\cf]{f}$ \footfullcite{HicEtal17a,KunEtal19a,DinEtal20a}.  \\
+	\item Alternatively, assume $f \in \smallcone$ and bound $ \norm[\cf]{f}$ or equivalent\footfullcite{HicEtal17a,KunEtal19a,DinHic20a} \\
 	\emph{What you do not see is not much worse than what you see?}
 \end{itemize}}
 
-\only<4->{\item \alert{Optimality:} is $n^*(f,\varepsilon)$ essentially as small as possible?
+\only<3->{\item \alert{Optimality:} is $n^*(f,\varepsilon)$ essentially as small as possible?
 	
 	\item \alert{Tractability:} does $n^*(f,\varepsilon)$ depend nicely on $d$?
 }
@@ -126,20 +132,32 @@ Adaptive algorithms are convenient for the practitioner because they automatical
 
 \end{frame}
 
-\begin{frame}{Solving General Linear Problems Using Series Coefficients, $\LambdaSer$\footfullcite{DinHic20a}}
+\begin{frame}<1>[label = Setup]{Solving General Linear Problems Using Series Coefficients\footfullcite{DinEtal20a}}
 	
 	\vspace{-7ex}
 	
 	\begin{align*}
-	\only<1>{\cf &:= \left \{ f = \sum_{i=1}^\infty \hf(\vk_i) u_{\vk_i} : \norm[\cf]{f} := \norm[\rho]{\left(\frac{\bigabs{\hf(\vk_i)}}{\lambda_{\vk_i}} \right)_{i =1}^\infty} \right \}, \qquad 
+	\only<1-2>{\cf &:= \left \{ f = \sum_{i=1}^\infty \hf(\vk_i) u_{\vk_i} : \norm[\cf]{f} := \norm[\rho]{\left(\frac{\bigabs{\hf(\vk_i)}}{\lambda_{\vk_i}} \right)_{i =1}^\infty} \right \} \qquad 
 		\begin{minipage}{4.2cm}\raggedright  $\lambda_{\vk_1} \ge \lambda_{\vk_2} \ge \cdots > 0$ \\
 		\alert{$\vlambda$ affects convergence rate \&  \\ tractability}\end{minipage}\\
-		\cg &: = \biggl \{ g = \sum_{i=1}^\infty \hg(\vk) v_{\vk} : \norm[\cg]{g} := \bignorm[\tau]{\hg}\biggr \}, \qquad v_{\vk} = S(u_{\vk}) \\}
-	\cc &: = \left\{f \in \cf :  
-	\sigma_\ell(f) \le a b^{\ell - k}\sigma_k(f) \quad \forall k \le \ell \right\}  \\
-	\app(f,n) &= \sum_{i=1}^{n} \hf(\vk_i) v_{\vk_i} \text{ is optimal for fixed }n, \qquad \norm[\cg]{S(f) - \Sapp(f,n_k)} \le \frac{ab \sigma_k(f)}{\sqrt{1 - b^2}} \\[-1ex]
+		\cg &: = \biggl \{ g = \sum_{i=1}^\infty \hg(\vk_i) v_{\vk_i} : \norm[\cg]{g} := \bignorm[\tau]{\hg}\biggr \}, \qquad v_{\vk} = \sol(u_{\vk}) \\}
+	\cc_{\vlambda, n_1, A} &: = \Biggl\{ f \in \cf : \norm[\cf]{f} \le A\norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}} \Biggr\} \qquad 
+		\begin{minipage}{4.2cm}\raggedright 
+		\alert{what is observed initially \\ tells us enough}\end{minipage}  
+		\uncover<2->{\\
+	\app(f,n) &= \sum_{i=1}^{n} \hf(\vk_i) v_{\vk_i}\quad  \alert{\text{optimal for fixed }n}
+	\qquad \norm[\cg]{\sol(f) - \app(f,n)} \le  \ERRN \\[-1ex]
+\MoveEqLeft[4]{\ERRN := \underbrace{\left[ A^\rho \norm[\rho]{\left( \frac{\hf(\vk_i)}{\lambda_{\vk_i}} \right)_{i=1}^{n_1}}^\rho -  \norm[\rho]{\left(\frac{\hf(\vk_i)}{\lambda_{\vk_i}}\right)_{i=1}^n}^\rho \right]^{1/\rho}}_{\text{upper bound on } \norm[\cf]{f - \sum_{i=1}^{n} \hf(\vk_i) u_{\vk_i}}}
+\, \underbrace{\bignorm[\rho']{\bigl( \lambda_{\vk_i}  \bigr)_{i = n+1}^{\infty}}}_{\norm[\cf \to \cg]{\sol - \app(\cdot,n)}}  
+\quad \begin{minipage}{2cm}
+$\displaystyle \frac 1\rho + \frac 1 {\rho'} = \frac 1 \tau $\\[1ex]
+\alert{\text{data-driven}}
+\end{minipage}
+}
+}
+    \only<3->{\\[-1ex]
 	\alert{A(f,\varepsilon)} & \alert{= \Sapp(f,n_k)} \text{ for the smallest $k$ satisfying } \alert{\sigma_k(f) \le \frac{\varepsilon \sqrt{1 - b^2}}{ab}}
-	\only<2>{\\ 
+	\\ 
 		\MoveEqLeft{\alert{\cost(A,\cc,\varepsilon,\rho) = n_{\ell^\dagger}}, \quad 
 			\ell^\dagger \le \min \left \{\ell \in \naturals : \frac{\rho^2}{\varepsilon^2} \le \frac{(1 - b^2)}{a^2b^2} \left[ \sum_{k=1}^{\ell-1} \frac{b^{2(k-\ell)}}{a^2\lambda_{n_{k-1}+1}^2} + \frac{1}{\lambda_{n_{\ell-1}+1}^2}\right]   \right\}} \\
 		\MoveEqLeft{\cost(A,\cc,\varepsilon,\rho) \text{ \alert{essentially no worse than} } \comp(\ca(\cc,\LambdaAll),\varepsilon,\rho)}\\
@@ -147,6 +165,43 @@ Adaptive algorithms are convenient for the practitioner because they automatical
 	\end{align*}
 	
 \end{frame}
+
+
+\begin{frame}{Legendre and Chebyshev Bases for Function Approximation}
+\vspace{-3ex}
+	\begin{tabular}{>{\centering}m{0.18\textwidth}>{\centering}m{0.18\textwidth}>{\centering}m{0.18\textwidth}>{\centering}m{0.18\textwidth}>{\centering}m{0.18\textwidth}}
+		\includegraphics[width =0.18\textwidth]{ProgramsImages/Legendre_Degree_0.png}  &
+		\includegraphics[width =0.18\textwidth]{ProgramsImages/Legendre_Degree_1.png}  &
+		\includegraphics[width =0.18\textwidth]{ProgramsImages/Legendre_Degree_2.png}  &
+		\includegraphics[width =0.18\textwidth]{ProgramsImages/Legendre_Degree_3.png}  &
+		\includegraphics[width =0.18\textwidth]{ProgramsImages/Legendre_Degree_4.png} 
+	\tabularnewline[-7ex]
+	Legendre
+	\tabularnewline
+	\tabularnewline
+		\includegraphics[width =0.18\textwidth]{ProgramsImages/Legendre_Degree_1_1.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Legendre_Degree_1_2.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Legendre_Degree_1_3.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Legendre_Degree_2_2.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Legendre_Degree_2_3.png} 
+\tabularnewline[0ex]
+		\includegraphics[width =0.18\textwidth]{ProgramsImages/Chebyshev_Degree_0.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Chebyshev_Degree_1.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Chebyshev_Degree_2.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Chebyshev_Degree_3.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Chebyshev_Degree_4.png} 
+\tabularnewline[-7ex]
+Chebyshev \tabularnewline
+\tabularnewline
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Chebyshev_Degree_1_1.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Chebyshev_Degree_1_2.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Chebyshev_Degree_1_3.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Chebyshev_Degree_2_2.png}  &
+\includegraphics[width =0.18\textwidth]{ProgramsImages/Chebyshev_Degree_2_3.png} 
+	\end{tabular}
+\end{frame}
+
+
 
 \begin{frame}{Multivariate Linear Problems}
 \vspace{-3ex}
@@ -267,7 +322,38 @@ where $\app(f,\varepsilon)$ depends on \alert{function values}, $\LambdaStd$, \a
 		\end{equation*}
 		\vspace{-2ex}
 		\begin{multline*}
-		\cc'_{\vlambda, \vomega, A'} : = \{ f \in \cf : \norm[\cf]{f} \le A'\norm[\cf']{f}\} \subseteq \cc_{\vlambda, n_1, A} : = \biggl\{ f \in \cf : \norm[\cf]{f} \le A\norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}} \biggr\} \\
+	\{ f \in \cf : \norm[\cf]{f} \le A'\norm[\cf']{f}\} 
+	=: 	\alert{\cc'_{\vlambda, \vomega, A'} \subseteq \cc_{\vlambda, n_1, A}} : = \biggl\{ f \in \cf : \norm[\cf]{f} \le A\norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}} \biggr\} \\
+\text{for } A \ge \omega_1A'\left[\frac{1 + (\omega_{n_1+1}/\omega_1)^\rho}{1 - (\omega_{n_1+1}A')^\rho}\right]^{1/\rho}, \ \ \omega_{n_1+1}A' < 1 
+		\end{multline*}
+
+\only<1>{\vspace{-6ex}} 
+	For any $f \in 	\cc'_{A'} $ it follows that 
+	\begin{align*}
+\only<1>{\norm[\cf']{f}^\rho- \norm[\rho]{\biggl ( \frac{\hf(\vk_i) \omega_i }{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}}^\rho 
+	& = \norm[\rho]{\biggl ( \frac{\hf(\vk_i) \omega_i }{\lambda_{\vk_i}} \biggr) _{i=n_1 + 1}^{\infty}}^\rho \\
+    & \le \omega_{n_1+1}^\rho \norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=n_1 + 1}^{\infty}}^\rho 
+     = \omega_{n_1+1}^\rho \left[ \norm[\cf]{f}^\rho - \norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}}^\rho \right ]\\	
+     & \le \omega_{n_1+1}^\rho \left[ A'{}^\rho \norm[\cf']{f}^\rho - \omega_1^{-\rho} \norm[\rho]{\biggl ( \frac{\hf(\vk_i) \omega_i}{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}}^\rho \right ]}
+ \only<2>{
+ 	\norm[\cf']{f}^\rho & \le \frac{1 + (\omega_{n_1+1}/\omega_1)^\rho}{1 - (\omega_{n_1+1}A')^\rho} \norm[\rho]{\biggl ( \frac{\hf(\vk_i) \omega_i }{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}}^\rho \\
+  	\norm[\cf]{f} & \le \omega_1A'\left[\frac{1 + (\omega_{n_1+1}/\omega_1)^\rho}{1 - (\omega_{n_1+1}A')^\rho}\right]^{1/\rho} \norm[\rho]{\biggl ( \frac{\hf(\vk_i)}{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}}
+}
+	\end{align*}
+\end{frame}
+
+\begin{frame}
+	\frametitle{An Alternative Cone Like Our Cone}
+	\vspace{-5.5ex}
+	\begin{equation*}
+	\norm[\cf]{f} : = \norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^\infty}, \quad \lambda_{\vk_i} \downarrow 0, \qquad
+	\norm[\cf']{f} : = \norm[\rho]{\biggl ( \frac{\hf(\vk_i) \omega_i}{\lambda_{\vk_i}} \biggr) _{i=1}^\infty},  
+	\quad \omega_{i} \downarrow
+		\end{equation*}
+		\vspace{-2ex}
+		\begin{multline*}
+	\{ f \in \cf : \norm[\cf]{f} \le A'\norm[\cf']{f}\} 
+	=: 	\alert{\cc'_{\vlambda, \vomega, A'} \supseteq \cc_{\vlambda, n_1, A}} : = \biggl\{ f \in \cf : \norm[\cf]{f} \le A\norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}} \biggr\} \\
 \text{for } A = \omega_1A'\left[\frac{1 + (\omega_{n_1+1}/\omega_1)^\rho}{1 - (\omega_{n_1+1}A')^\rho}\right]^{1/\rho}, \ \ \omega_{n_1+1}A' < 1 
 		\end{multline*}
 
@@ -285,6 +371,7 @@ where $\app(f,\varepsilon)$ depends on \alert{function values}, $\LambdaStd$, \a
 }
 	\end{align*}
 \end{frame}
+
 
 \end{document}
 
