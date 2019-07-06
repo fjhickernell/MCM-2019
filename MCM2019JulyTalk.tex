@@ -29,6 +29,8 @@
 \DeclareMathOperator{\app}{APP}
 \DeclareMathOperator{\alg}{ALG}
 \DeclareMathOperator{\ERR}{ERR}
+\DeclareMathOperator{\COST}{COST}
+\DeclareMathOperator{\COMP}{COMP}
 \newcommand{\dataN}{\bigl(\hf(\vk_i)\bigr)_{i=1}^n}
 \newcommand{\dataNj}{\bigl(\hf(\vk_i)\bigr)_{i=1}^{n_j}}
 \newcommand{\dataNjd}{\bigl(\hf(\vk_i)\bigr)_{i=1}^{n_{j^\dagger}}}
@@ -132,37 +134,80 @@ Adaptive algorithms are convenient for the practitioner because they automatical
 
 \end{frame}
 
+\section{Algorithm}
+
 \begin{frame}<1>[label = Setup]{Solving General Linear Problems Using Series Coefficients\footfullcite{DinEtal20a}}
 	
 	\vspace{-7ex}
 	
 	\begin{align*}
-	\only<1-2>{\cf &:= \left \{ f = \sum_{i=1}^\infty \hf(\vk_i) u_{\vk_i} : \norm[\cf]{f} := \norm[\rho]{\left(\frac{\bigabs{\hf(\vk_i)}}{\lambda_{\vk_i}} \right)_{i =1}^\infty} \right \} \qquad 
-		\begin{minipage}{4.2cm}\raggedright  $\lambda_{\vk_1} \ge \lambda_{\vk_2} \ge \cdots > 0$ \\
-		\alert{$\vlambda$ affects convergence rate \&  \\ tractability}\end{minipage}\\
-		\cg &: = \biggl \{ g = \sum_{i=1}^\infty \hg(\vk_i) v_{\vk_i} : \norm[\cg]{g} := \bignorm[\tau]{\hg}\biggr \}, \qquad v_{\vk} = \sol(u_{\vk}) \\}
-	\cc_{\vlambda, n_1, A} &: = \Biggl\{ f \in \cf : \norm[\cf]{f} \le A\norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}} \Biggr\} \qquad 
-		\begin{minipage}{4.2cm}\raggedright 
-		\alert{what is observed initially \\ tells us enough}\end{minipage}  
-		\uncover<2->{\\
-	\app(f,n) &= \sum_{i=1}^{n} \hf(\vk_i) v_{\vk_i}\quad  \alert{\text{optimal for fixed }n}
-	\qquad \norm[\cg]{\sol(f) - \app(f,n)} \le  \ERRN \\[-1ex]
-\MoveEqLeft[4]{\ERRN := \underbrace{\left[ A^\rho \norm[\rho]{\left( \frac{\hf(\vk_i)}{\lambda_{\vk_i}} \right)_{i=1}^{n_1}}^\rho -  \norm[\rho]{\left(\frac{\hf(\vk_i)}{\lambda_{\vk_i}}\right)_{i=1}^n}^\rho \right]^{1/\rho}}_{\text{upper bound on } \norm[\cf]{f - \sum_{i=1}^{n} \hf(\vk_i) u_{\vk_i}}}
-\, \underbrace{\bignorm[\rho']{\bigl( \lambda_{\vk_i}  \bigr)_{i = n+1}^{\infty}}}_{\norm[\cf \to \cg]{\sol - \app(\cdot,n)}}  
-\quad \begin{minipage}{2cm}
-$\displaystyle \frac 1\rho + \frac 1 {\rho'} = \frac 1 \tau $\\[1ex]
-\alert{\text{data-driven}}
+	\only<1-2>{
+        \cf &:= \left \{ f = \sum_{i=1}^\infty \hf(\vk_i) u_{\vk_i} : \norm[\cf]{f} := \norm[\rho]{\left(\frac{\bigabs{\hf(\vk_i)}}{\lambda_{\vk_i}} \right)_{i =1}^\infty} \right \} \qquad 
+		\begin{minipage}{4.2cm}\raggedright  
+		    $\lambda_{\vk_1} \ge \lambda_{\vk_2} \ge \cdots > 0$ \\
+		    \alert{$\vlambda$ affects convergence rate \&  \\ tractability}
+		\end{minipage}\\
+		\cg &: = \biggl \{ g = \sum_{i=1}^\infty \hg(\vk_i) v_{\vk_i} : \norm[\cg]{g} := \bignorm[\tau]{\hg}\biggr \}, \qquad v_{\vk} = \sol(u_{\vk}), \ \tau \le \rho \\
+		}
+	    \cc_{\vlambda, n_1, A} &: = \Biggl\{ f \in \cf : \norm[\cf]{f} \le A\norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}} \Biggr\} \qquad 
+		\begin{minipage}{5.5cm}\raggedright 
+		    \alert{initial $n_1$ samples \\ tells us enough}
+		\end{minipage}  
+        \only<1-4>{\uncover<2-4>{\\
+	        \app(f,n) &= \sum_{i=1}^{n} \hf(\vk_i) v_{\vk_i}\quad  \alert{\text{optimal for fixed }n}
+	        \qquad \norm[\cg]{\sol(f) - \app(f,n)} \le  \ERRN 
+	        }}
+		\end{align*}
+		\vspace{-2ex}
+\only<1-4>{\uncover<2-4>{\begin{equation*}
+    \ERRN := \underbrace{\left[ A^\rho \norm[\rho]{\left( \frac{\hf(\vk_i)}{\lambda_{\vk_i}} \right)_{i=1}^{n_1}}^\rho -  \norm[\rho]{\left(\frac{\hf(\vk_i)}{\lambda_{\vk_i}}\right)_{i=1}^n}^\rho \right]^{1/\rho}}_{\text{upper bound on } \norm[\cf]{f - \sum_{i=1}^{n} \hf(\vk_i) u_{\vk_i}}}
+    \, 
+    \underbrace{\bignorm[\rho']{\bigl( \lambda_{\vk_i}  \bigr)_{i = n+1}^{\infty}}}_{\norm[\cf \to \cg]{\sol - \app(\cdot,n)}}  
+    \quad 
+\begin{minipage}{2cm}
+    $\displaystyle \frac 1\rho + \frac 1 {\rho'} = \frac 1 \tau $\\[1ex]
+    \alert{\text{data-driven}}
 \end{minipage}
-}
-}
-    \only<3->{\\[-1ex]
-	\alert{A(f,\varepsilon)} & \alert{= \Sapp(f,n_k)} \text{ for the smallest $k$ satisfying } \alert{\sigma_k(f) \le \frac{\varepsilon \sqrt{1 - b^2}}{ab}}
+\end{equation*}
+}}
+    \only<3-5>{\vspace{-2ex}
+    \begin{align*}
+	\alert<3>{\alg(f,\varepsilon)} & 
+	\alert<3>{= \app(f,n^*(f,\varepsilon))} 
+	\text{ for } \alert<3>{n^*(f,\varepsilon) = \min \{ n \in \naturals : \ERRN \le \varepsilon\} }
 	\\ 
-		\MoveEqLeft{\alert{\cost(A,\cc,\varepsilon,\rho) = n_{\ell^\dagger}}, \quad 
-			\ell^\dagger \le \min \left \{\ell \in \naturals : \frac{\rho^2}{\varepsilon^2} \le \frac{(1 - b^2)}{a^2b^2} \left[ \sum_{k=1}^{\ell-1} \frac{b^{2(k-\ell)}}{a^2\lambda_{n_{k-1}+1}^2} + \frac{1}{\lambda_{n_{\ell-1}+1}^2}\right]   \right\}} \\
-		\MoveEqLeft{\cost(A,\cc,\varepsilon,\rho) \text{ \alert{essentially no worse than} } \comp(\ca(\cc,\LambdaAll),\varepsilon,\rho)}\\
-		\MoveEqLeft{\text{\alert{No} tractability results}}}
-	\end{align*}
+    \uncover<4->{
+    \alert<4>{\COST(\alg,\cc_{\vlambda, n_1,A},\varepsilon,R)} 
+    & \alert<4>{= \max \bigl \{ n^*(f,\varepsilon) : f \in \cc_{\vlambda, n_1, A} \cap \cb_R \bigr\}} \\
+    & \alert<4>{= \min \left \{n \ge n_1 : \bignorm[\rho']{\bigl(  \lambda_{\vk_i}  \bigr)_{i = n+1}^{\infty}} \,
+    \le \varepsilon/[(A^\rho -1)^{1/\rho}R] \right \}}
+		}
+	\uncover<5->{ \\
+	\alert{\COMP(\ca(\cc_{\vlambda, n_1,A}),\varepsilon,R))} & = \min \{\COST(\alg',\cc_{\vlambda, n_1,A},\varepsilon,R)  : \alg' \in   \ca(\cc_{\vlambda, n_1,A})    \} \\
+	& \ge \alert{\COST(\alg,\cc_{\vlambda, n_1,A},\omega \varepsilon,R)}, \qquad 
+	\omega = \frac{2A(A^\rho -1)^{1/\rho}}{A - 1} > 1\\
+	& \qquad \qquad \text{\alert{via fooling functions}}
+	}
+    \end{align*}
+    \uncover<5>{$\alg$ is \alert{essentially optimal}}
+    }
+    \only<6>{For $\rho = \tau$ ($\rho'=\infty$), the problem $\sol_d :\cc_{d,\vlambda_d, n_1, A} \to \cg_d$ is 
+    \begin{description}
+    \item[Strongly polynomial tractable] iff there exist $i_0 \in \naturals$ and $\eta > 0$ such that \quad
+    $\displaystyle  \sup_{d\in\naturals} \sum_{i=i_0}^\infty \lambda_{d,\vk_i}^\eta < \infty$
+    
+    \item[Polynomial tractable] iff there exist $\eta_1, \eta_2 \ge 0$ and $\eta_3, K>0$ such that \qquad
+ $
+    \sup_{d\in\naturals} d^{-\eta_1}\, \sum_{i=\lceil K d^{\eta_2} \rceil}^\infty \lambda_{d,\vk_i}^{\eta_3} < \infty
+ $
+ \item[Weakly tractable] iff \quad
+ $
+  \sup_{d\in\naturals} \, \exp(-cd) \sum_{i=1}^\infty \exp\left(-c\left(\frac{1}{\lambda_{d,\vk_i}}\right)\right) <\infty$ \; for all $c>0$
+ 
+    \end{description}
+    Analogous results exist for $\rho > \tau$ ($\rho' < \infty$)
+    }
+
 	
 \end{frame}
 
@@ -201,115 +246,38 @@ Chebyshev \tabularnewline
 	\end{tabular}
 \end{frame}
 
+\againframe<2-4>{Setup}
 
+\section{Optimality}
 
-\begin{frame}{Multivariate Linear Problems}
-\vspace{-3ex}
-\begin{tabular}{p{0.47\textwidth}p{0.5\textwidth}}
-Given $f \in \cf$ find $S(f) \in \cg$, where \\
-$\sol: \cf \to \cg$ is linear, e.g., 
-\begin{gather*}
-    S(f) = \int_{\reals^d} f(\vx) \, \varrho(\vx) \, \dif \vx\\
-    S(f) = f\\
-    S(f) = \frac{\partial f}{\partial x_1} \\
-    - \nabla^2 S(f) = f, \ \  S(f) = 0 \text{ on boundary}
-\end{gather*}
-&
-\vspace{-7ex}
-\alert{Successful algorithms}
-\vspace{-3ex}
-\begin{multline*}
-    \ca(\cc,\Lambda) : = \{\app: \cc \times (0,\infty) \to \cg \text{ such that } \\
-\norm[\cg]{\sol(f) - \app(f,\varepsilon) } \le \varepsilon \ \ \forall f \in \cc \subseteq \cf, \ \varepsilon > 0 \}
-\end{multline*}
+\againframe<5>{Setup}
 
-\vspace{-1ex}
-where $\app(f,\varepsilon)$ depends on \alert{function values}, $\LambdaStd$, \alert{Fourier coefficients}, $\LambdaSer$, or \alert{any linear functionals}, $\LambdaAll$, e.g., 
+\section{Tractability}
 
-\vspace{-4ex}
-\begin{gather*}
-    \Sapp(f,n) = \sum_{i=1}^n f(\vx_i) \, g_i, \quad g_i \in \cg \\
-    \Sapp(f,n) = \sum_{i=1}^n \hf_i \, g_i, \quad g_i \in \cg \\
-    \Sapp(f,n) = \sum_{i=1}^n L_i(f) \, g_i, \quad g_i \in \cg \\
-\end{gather*}
+\againframe<6->{Setup}
 
-\vspace{-5ex}
-\hfill \hfill \alert{$\app(f,\varepsilon) = \Sapp(f,n) + $ stopping criterion}\newline
-\phantom{a} \hfill \hfill \alert{$\cc$ is a \smallcone}
+\section{Alternate Cone}
 
-\end{tabular}
-    
+\begin{frame}
+	\frametitle{An Alternate Cone Like Our Cone}
+	\vspace{-5.5ex}
+	\begin{gather*}
+	\norm[\cf]{f} : = \norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^\infty}, \quad \lambda_{\vk_i} \downarrow 0, \qquad
+	\norm[\cf']{f} : = \norm[\rho]{\biggl ( \frac{\hf(\vk_i) \omega_i}{\lambda_{\vk_i}} \biggr) _{i=1}^\infty},  
+	\quad \omega_{i} \downarrow
+\\
+	\cc_{\vlambda, n_1, A} : = \Biggl\{ f \in \cf : \norm[\cf]{f} \le A\norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^{n_1}} \Biggr\} 
+	\qquad 
+	\alert{\cc'_{\vlambda, \vomega, A'} : = \{ f \in \cf : \norm[\cf]{f} \le A'\norm[\cf']{f}\}} 
+	\end{gather*}
+
+		\begin{equation*}
+\alert{\cc'_{\vlambda, \vomega, A'} \subseteq \cc_{\vlambda, n_1, A}} 
+\text{for } A \ge \omega_1A'\left[\frac{1 + (\omega_{n_1+1}/\omega_1)^\rho}{1 - (\omega_{n_1+1}A')^\rho}\right]^{1/\rho}, \ \ \omega_{n_1+1}A' < 1 
+		\end{equation*}
+
 \end{frame}
 
-\begin{frame}{Issues}
-
-\vspace{-3ex}
-
-\begin{tabular}{p{0.47\textwidth}p{0.5\textwidth}}
-Given $f \in \cf$ find $S(f) \in \cg$, where \\
-$\sol: \cf \to \cg$ is linear
-
-\bigskip
-
-\alert{Successful algorithms}
-\vspace{-2ex}
-\begin{multline*}
-    \ca(\cc,\Lambda) : = \{\app: \cc \times (0,\infty) \to \cg \text{ such that } \\
-\norm[\cg]{\sol(f) - \app(f,\varepsilon) } \le \varepsilon \ \ \forall f \in \cc \subseteq \cf, \ \varepsilon > 0 \}
-\end{multline*}
-
-\vspace{-1ex}
-where $\app(f,\varepsilon)$ depends on \alert{function values}, $\LambdaStd$, \alert{Fourier coefficients}, $\LambdaSer$, or \alert{any linear functionals}, $\LambdaAll$
-&
-
-\vspace{-9ex}
-\uncover<1->{\alert{Solvability}\footfullcite{KunEtal19a}: $\ca(\cc,\Lambda) \ne \emptyset$
-
-\smallskip
-
-\alert{Construction}: Find $\app \in \ca(\cc,\Lambda)$}
-
-\smallskip
-
-\uncover<2->{\alert{Cost}: $\cost(\app,f,\varepsilon) = $ \# of function data
-\newline
- $\cost(\app,\cc,\varepsilon, \rho) = \max_{f \in \cc \cap \cb_{\rho}} \cost(\app,f,\varepsilon)$
- \newline
- $\cb_{\rho} := \{f \in \cf : \norm[\cf]{f} \le \rho \}$
- 
- \smallskip
-
-\alert{Complexity}\footfullcite{TraWasWoz88}: $\comp(\ca(\cc,\Lambda),\varepsilon,\rho)$ 
-\newline \phantom{a} \hfill \hfill $= \min_{\app \in \ca(\cc,\Lambda)} \cost(\app,\cc,\varepsilon, \rho)$
-
-\alert{Optimality}:  \newline \phantom{a} \hfill \hfill $\cost(\app,\cc,\varepsilon, \rho) \le \comp(\ca(\cc,\Lambda),\alert{\omega} \varepsilon,\rho)$}
-
-\smallskip
-
-\uncover<3->{\alert{Tractability}\footfullcite{NovWoz08a}: $\comp(\ca(\cc,\Lambda),\varepsilon, \rho) \le C \rho^p\varepsilon^{-p} d^{q} $}
-
-\smallskip
-\uncover<4->{\alert{Implementation} in open source software}
-
-\vspace{-6ex}
-
-\phantom{a}
-
-\end{tabular}
-
-    
-\end{frame}
-
-
-\finalthanksnote{These slides are  available at \\  \href{https://speakerdeck.com/fjhickernell/ricam-2018-nov}{\nolinkurl{speakerdeck.com/fjhickernell/ricam-2018-nov}}}
-
-
-\thankyouframe
-
-\begin{frame}[allowframebreaks]
-	\frametitle{References}
-\printbibliography
-\end{frame}
 
 
 \begin{frame}
@@ -343,7 +311,7 @@ where $\app(f,\varepsilon)$ depends on \alert{function values}, $\LambdaStd$, \a
 \end{frame}
 
 \begin{frame}
-	\frametitle{An Alternative Cone Like Our Cone}
+	\frametitle{An Alternate Cone Like Our Cone}
 	\vspace{-5.5ex}
 	\begin{equation*}
 	\norm[\cf]{f} : = \norm[\rho]{\biggl ( \frac{\hf(\vk_i) }{\lambda_{\vk_i}} \biggr) _{i=1}^\infty}, \quad \lambda_{\vk_i} \downarrow 0, \qquad
@@ -371,6 +339,21 @@ where $\app(f,\varepsilon)$ depends on \alert{function values}, $\LambdaStd$, \a
 }
 	\end{align*}
 \end{frame}
+
+
+
+
+\finalthanksnote{These slides are  available at \\  \href{https://speakerdeck.com/fjhickernell/ricam-2018-nov}{\nolinkurl{speakerdeck.com/fjhickernell/ricam-2018-nov}}}
+
+
+\thankyouframe
+
+\begin{frame}[allowframebreaks]
+	\frametitle{References}
+\printbibliography
+\end{frame}
+
+
 
 
 \end{document}
